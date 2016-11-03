@@ -85,7 +85,7 @@ class GenEventFilter : public edm::EDFilter {
       float mva_constituents_;
       float mva_charged_constituents_;
 
-      TMVA::Reader* reader_;
+      std::auto_ptr<TMVA::Reader> reader_;
 };
 
 //
@@ -119,7 +119,7 @@ GenEventFilter::GenEventFilter(const edm::ParameterSet& config) :
    jet_token_ = consumes<reco::GenJetCollection>(config.getParameter<edm::InputTag>("genJets"));
 
    if (use_fakes_) {
-      reader_ = new TMVA::Reader();
+      reader_.reset(new TMVA::Reader());
       reader_->AddVariable("pt", &mva_pt_);
       reader_->AddVariable("chargedPt", &mva_charged_pt_);
       reader_->AddVariable("constituents", &mva_constituents_);
@@ -131,7 +131,6 @@ GenEventFilter::GenEventFilter(const edm::ParameterSet& config) :
 
 GenEventFilter::~GenEventFilter()
 {
-   delete reader_;
 }
 
 

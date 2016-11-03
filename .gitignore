@@ -1,0 +1,6 @@
+.__afs*
+*.sw?
+*.pyc
+Session.vim
+tags
+python/__init__.py

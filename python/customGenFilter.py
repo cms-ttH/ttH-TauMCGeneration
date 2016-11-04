@@ -30,5 +30,6 @@ def customizeForGenFiltering(process):
         else:
             sequence.insert(1, process.ttHGenFilter)
     process.ttHfilter_step = cms.Path(process.ttHGenFilter)
+    process.schedule.extend([process.ttHfilter_step])
     process.AODSIMoutput.SelectEvents.SelectEvents = cms.vstring('ttHfilter_step')
     return process

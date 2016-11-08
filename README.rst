@@ -157,6 +157,9 @@ command can be used:
        --era Run2_25ns \
        --no_exec \
 
+Notice the second ``--customise`` parameter, which will set up a basic
+filter after the generation step to trim the selected events.
+
 Premixed pile-up is available from the following two datasets::
 
     /Neutrino_E-10_gun/RunIISpring16FSPremix-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/GEN-SIM-DIGI-RAW

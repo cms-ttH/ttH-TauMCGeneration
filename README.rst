@@ -1,7 +1,7 @@
-.. contents::
-
 MC Generation
 =============
+
+.. contents::
 
 Pulling in basic steps from MCM
 -------------------------------

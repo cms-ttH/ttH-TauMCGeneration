@@ -55,7 +55,7 @@ class GenEventFilter : public edm::EDFilter {
       virtual bool filter(edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override;
 
-      bool isFake(const reco::GenJet& j);
+      bool isFake(const reco::GenJet& j, const reco::GenParticleCollection& particles);
 
       // ----------member data ---------------------------
       edm::EDGetTokenT<reco::GenParticleCollection> particle_token_;
@@ -84,6 +84,14 @@ class GenEventFilter : public edm::EDFilter {
       float mva_charged_pt_;
       float mva_constituents_;
       float mva_charged_constituents_;
+      float mva_signal_pt_;
+      float mva_signal_constituents_;
+      float mva_signal_charged_pt_;
+      float mva_signal_charged_constituents_;
+      float mva_iso_pt_;
+      float mva_iso_constituents_;
+      float mva_iso_charged_pt_;
+      float mva_iso_charged_constituents_;
 
       std::auto_ptr<TMVA::Reader> reader_;
 };
@@ -124,7 +132,15 @@ GenEventFilter::GenEventFilter(const edm::ParameterSet& config) :
       reader_->AddVariable("chargedPt", &mva_charged_pt_);
       reader_->AddVariable("constituents", &mva_constituents_);
       reader_->AddVariable("chargedConstituents", &mva_charged_constituents_);
-      reader_->BookMVA("BDTG", edm::FileInPath("ttH/TauRoast/data/faketau.weights.xml").fullPath().c_str());
+      reader_->AddVariable("signalPt", &mva_signal_pt_);
+      reader_->AddVariable("signalChargedPt", &mva_signal_charged_pt_);
+      reader_->AddVariable("signalConstituents", &mva_signal_constituents_);
+      reader_->AddVariable("signalChargedConstituents", &mva_signal_charged_constituents_);
+      reader_->AddVariable("isoPt", &mva_iso_pt_);
+      reader_->AddVariable("isoChargedPt", &mva_iso_charged_pt_);
+      reader_->AddVariable("isoConstituents", &mva_iso_constituents_);
+      reader_->AddVariable("isoChargedConstituents", &mva_iso_charged_constituents_);
+      reader_->BookMVA("BDTG", edm::FileInPath("ttH/TauMCGeneration/data/faketau.weights.xml").fullPath().c_str());
    }
 }
 
@@ -160,23 +176,84 @@ mother(const T& p)
 }
 
 bool
-GenEventFilter::isFake(const reco::GenJet& j)
+GenEventFilter::isFake(const reco::GenJet& j, const reco::GenParticleCollection& particles)
 {
    mva_pt_ = j.p4().Pt();
+
    mva_constituents_ = j.numberOfDaughters();
    mva_charged_constituents_ = 0;
+   mva_signal_constituents_ = 0;
+   mva_signal_charged_constituents_ = 0;
+   mva_iso_constituents_ = 0;
+   mva_iso_charged_constituents_ = 0;
 
    LorentzVector charged_p;
+   LorentzVector signal_p;
+   LorentzVector signal_charged_p;
+   LorentzVector iso_p;
+   LorentzVector iso_charged_p;
 
    for (unsigned i = 0; i < j.numberOfDaughters(); ++i) {
       auto cand = j.daughterPtr(i);
-      if (cand.isNonnull() and cand->charge() != 0) {
-         charged_p += cand->p4();
-         ++mva_charged_constituents_;
+      if (cand.isNonnull()) {
+         auto dR = deltaR(j.p4(), cand->p4());
+         if (cand->charge() != 0) {
+            charged_p += cand->p4();
+            ++mva_charged_constituents_;
+            if (dR < .12) {
+               ++mva_signal_charged_constituents_;
+               signal_charged_p += cand->p4();
+            } else if (dR < .3) {
+               ++mva_iso_charged_constituents_;
+               iso_charged_p += cand->p4();
+            }
+         }
+         if (dR < .12) {
+            ++mva_signal_constituents_;
+            signal_p += cand->p4();
+         } else if (dR < .3) {
+            ++mva_iso_constituents_;
+            iso_p += cand->p4();
+         }
       }
    }
 
    mva_charged_pt_ = charged_p.Pt();
+
+   mva_signal_pt_ = signal_p.Pt();
+   mva_signal_charged_pt_ = signal_charged_p.Pt();
+   mva_iso_pt_ = iso_p.Pt();
+   mva_iso_charged_pt_ = iso_charged_p.Pt();
+
+   const std::vector<int> allowed{11, 13};
+   std::vector<std::pair<float, const reco::GenParticle*>> ps;
+   for (const auto& p: particles) {
+      auto dR = deltaR(j.p4(), p.p4());
+      if (dR > 0.0001
+            and std::find(allowed.begin(), allowed.end(), abs(p.pdgId())) != allowed.end()
+            and (p.statusFlags().isPrompt() or
+               p.isPromptFinalState() or
+               p.statusFlags().isDirectPromptTauDecayProduct() or
+               p.isDirectPromptTauDecayProductFinalState()))
+         ps.push_back(std::make_pair(dR, &p));
+   }
+   std::sort(std::begin(ps), std::end(ps), [](const auto& a, const auto& b) { return a.first < b.first; });
+
+   float closest_dr = 666.;
+   if (ps.size() > 0)
+      closest_dr = deltaR(j.p4(), ps[0].second->p4());
+
+   if (closest_dr < .1)
+      return false;
+
+   if (mva_pt_ < 18 or mva_signal_pt_ < 18)
+      return false;
+
+   if (fabs(j.eta() < 2.5))
+      return false;
+
+   if (mva_constituents_ > 19 or mva_charged_constituents_ > 9 or mva_iso_constituents_ > 11)
+      return false;
 
    return reader_->EvaluateMVA("BDTG") > fake_cut_;
 }
@@ -222,7 +299,7 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
 
    if (use_fakes_)
       taus += std::count_if(std::begin(*genjets), std::end(*genjets),
-            [&](const auto& j) { return this->isFake(j); });
+            [&](const auto& j) { return this->isFake(j, *particles); });
 
    return (
          leptons + jets + taus >= total_count_ and

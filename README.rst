@@ -3,14 +3,14 @@ MC Generation
 
 .. contents::
 
-Pulling in basic steps from MCM
+Pulling in basic steps from McM
 -------------------------------
 
-To clone workflows from `MCM`_, select a dataset to clone, i.e.::
+To clone workflows from `McM`_, select a dataset to clone, i.e.::
 
     /TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM
 
-Then visit the `MCM`_ homepage, and click the “Request” item at the top of
+Then visit the `McM`_ homepage, and click the “Request” item at the top of
 the page, and select “Output Dataset” below to paste the dataset to clone:
 
 .. figure:: search.png
@@ -24,12 +24,25 @@ all steps to reproduce the original dataset can be obtained:
 
    Workflows to completely reproduce a dataset.
 
+If this yields too many results, an alternative is to follow the “parent”
+links in DAS and look at the field “McM info” under the dataset name.  Then
+search for the McM id by selecting “Navigation” and then filling in the
+field “prepid”:
+
+.. figure:: das.png
+
+   Searching for the parent LHE dataset and its McM info.
+
+.. figure:: prepid.png
+
+   Using this prepid to search for the McM setup.
+
 Now the second to left icon |icon| in the search results can be used to download
 the setup scripts.  For the `LHEGS` step:
 
 .. |icon| image:: icon.png
 
-.. _MCM: https://cms-pdmv.cern.ch/mcm/
+.. _McM: https://cms-pdmv.cern.ch/mcm/
 
 .. code-block:: shell
 
@@ -122,7 +135,7 @@ Note the following from the `FastSim TWiki`_ about `runTheMatrix.py` workflows:
 Release Setup
 ~~~~~~~~~~~~~
 
-Unfortunately, these steps don't work well with the MCM workflows.  First,
+Unfortunately, these steps don't work well with the McM workflows.  First,
 a pile-up sample needs to be produced.  To set up the environment
 
 .. code-block:: shell

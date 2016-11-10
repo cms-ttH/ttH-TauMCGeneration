@@ -6,6 +6,9 @@ MC Generation
 Pulling in basic steps from McM
 -------------------------------
 
+We can look at either extracting the full chain in one query, or following
+a specific LHE dataset (recommended).
+
 Cloning the full chain
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -27,7 +30,7 @@ all steps to reproduce the original dataset can be obtained:
 
    Workflows to completely reproduce a dataset.
 
-Extracting LHE configurations
+Using LHE configurations only
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this yields too many results, an alternative is to follow the “parent”
@@ -42,6 +45,9 @@ field “prepid”:
 .. figure:: prepid.png
 
    Using this prepid to search for the McM setup.
+
+Extracting the setup
+~~~~~~~~~~~~~~~~~~~~
 
 Now the second to left icon |icon| in the search results can be used to download
 the setup scripts.  For the `LHEGS` step:

@@ -287,6 +287,9 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
       leptons.push_back(p);
    }
 
+   if (leptons.size() < lepton_count_)
+      return false;
+
    for (const auto& t: *gentaus) {
       bool overlap = false;
       for (const auto& l: leptons) {
@@ -299,6 +302,10 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
       if (not overlap and t.pt() > tau_pt_ and abs(t.eta()) < tau_eta_)
          taus.push_back(t);
    }
+
+   if (not use_fakes_
+       and (taus.size() < tau_count_ or leptons.size() + taus.size() < total_lepton_count_))
+      return false;
 
    reco::GenJetCollection cleanjets;
    for (const auto& j: *genjets) {
@@ -318,6 +325,9 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
       std::copy_if(std::begin(cleanjets), std::end(cleanjets), std::back_inserter(taus),
             [&](const auto& j) { return this->isFake(j, *particles); });
 
+   if (taus.size() < tau_count_ or leptons.size() + taus.size() < total_lepton_count_)
+      return false;
+
    for (const auto& j: cleanjets) {
       bool overlap = false;
       for (const auto& t: taus) {
@@ -333,10 +343,7 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
 
    return (
          leptons.size() + taus.size() + jets >= total_count_ and
-         leptons.size() + taus.size() >= total_lepton_count_ and
-         leptons.size() >= lepton_count_ and
-         jets >= jet_count_ and
-         taus.size() >= tau_count_
+         jets >= jet_count_
    );
 }
 

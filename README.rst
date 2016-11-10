@@ -6,6 +6,9 @@ MC Generation
 Pulling in basic steps from McM
 -------------------------------
 
+Cloning the full chain
+~~~~~~~~~~~~~~~~~~~~~~
+
 To clone workflows from `McM`_, select a dataset to clone, i.e.::
 
     /TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1/MINIAODSIM
@@ -23,6 +26,9 @@ all steps to reproduce the original dataset can be obtained:
 .. figure:: results.png
 
    Workflows to completely reproduce a dataset.
+
+Extracting LHE configurations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If this yields too many results, an alternative is to follow the “parent”
 links in DAS and look at the field “McM info” under the dataset name.  Then

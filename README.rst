@@ -200,3 +200,20 @@ As a final step, produce the `MiniAOD`:
        --datatier MINIAODSIM --conditions auto:run2_mc \
        --step PAT --runUnscheduled \
        --no_exec
+
+Filtering MiniAOD
+-----------------
+
+Something like the following can be added to a parameter set to filter MiniAOD:
+
+.. code-block:: python
+
+    process.load('ttH.TauMCGeneration.eventFilterMAOD_cfi')
+    process.evpath = cms.Path(process.ttHfilter)
+    process.output = cms.OutputModule(
+        "PoolOutputModule",
+        fileName=cms.untracked.string(options.outputFile),
+        outputCommands=cms.untracked.vstring(['keep *']),
+        SelectEvents=cms.untracked.PSet(SelectEvents=cms.vstring('evpath')),
+        dataset=cms.untracked.PSet(filterName=cms.untracked.string(''))
+    )

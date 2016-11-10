@@ -4,13 +4,15 @@ import FWCore.ParameterSet.Config as cms
 def customizeForGenFiltering(process):
     process.load("ttH.TauMCGeneration.eventFilter_cfi")
     for path in process.paths:
-        if path in ['generation_step', 'lhe_step']:
+        if path in ['lhe_step', 'digitisation_step']:
             continue
         sequence = getattr(process, path)
-        if path in ['digitisation_step']:
-            sequence *= process.ttHGenFilter
+        if path in ['generation_step']:
+            sequence._seq *= process.ttHGenFilter
         else:
             sequence.insert(1, process.ttHGenFilter)
+    if hasattr(process, 'pdigi'):
+        getattr(process, 'pdigi').insert(5, process.ttHGenFilter)
     process.ttHfilter_step = cms.Path(process.ttHGenFilter)
     process.schedule.extend([process.ttHfilter_step])
     process.AODSIMoutput.SelectEvents.SelectEvents = cms.vstring('ttHfilter_step')
@@ -18,19 +20,8 @@ def customizeForGenFiltering(process):
 
 
 def customizeForGenFilteringWithFakes(process):
-    process.load("ttH.TauMCGeneration.eventFilter_cfi")
+    process = customizeForGenFiltering(process)
     process.ttHGenFilter.useFakeTaus = cms.bool(True)
     process.ttHGenFilter.minTaus = cms.int32(2)
     process.ttHGenFilter.fakeCut = cms.double(0.)
-    for path in process.paths:
-        if path in ['generation_step', 'lhe_step']:
-            continue
-        sequence = getattr(process, path)
-        if path in ['digitisation_step']:
-            sequence *= process.ttHGenFilter
-        else:
-            sequence.insert(1, process.ttHGenFilter)
-    process.ttHfilter_step = cms.Path(process.ttHGenFilter)
-    process.schedule.extend([process.ttHfilter_step])
-    process.AODSIMoutput.SelectEvents.SelectEvents = cms.vstring('ttHfilter_step')
     return process

@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 ttHGenFilter = cms.EDFilter(
     "GenEventFilter",
     genParticles=cms.InputTag('genParticles'),
+    genTaus=cms.InputTag('tauGenJets'),
     genJets=cms.InputTag('ak4GenJetsNoNu'),
     leptonID=cms.vint32(11, 13),
     leptonPt=cms.vdouble(25, 20),

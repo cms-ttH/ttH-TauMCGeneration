@@ -59,6 +59,7 @@ class GenEventFilter : public edm::EDFilter {
 
       // ----------member data ---------------------------
       edm::EDGetTokenT<reco::GenParticleCollection> particle_token_;
+      edm::EDGetTokenT<reco::GenJetCollection> tau_token_;
       edm::EDGetTokenT<reco::GenJetCollection> jet_token_;
 
       std::vector<int> lepton_ids_;
@@ -74,11 +75,11 @@ class GenEventFilter : public edm::EDFilter {
       bool use_fakes_;
       double fake_cut_;
 
-      int lepton_count_;
-      int jet_count_;
-      int tau_count_;
-      int total_count_;
-      int total_lepton_count_;
+      unsigned int lepton_count_;
+      unsigned int jet_count_;
+      unsigned int tau_count_;
+      unsigned int total_count_;
+      unsigned int total_lepton_count_;
 
       float mva_pt_;
       float mva_charged_pt_;
@@ -124,6 +125,7 @@ GenEventFilter::GenEventFilter(const edm::ParameterSet& config) :
    total_lepton_count_(config.getParameter<int>("minTotalLeptons"))
 {
    particle_token_ = consumes<reco::GenParticleCollection>(config.getParameter<edm::InputTag>("genParticles"));
+   tau_token_ = consumes<reco::GenJetCollection>(config.getParameter<edm::InputTag>("genTaus"));
    jet_token_ = consumes<reco::GenJetCollection>(config.getParameter<edm::InputTag>("genJets"));
 
    if (use_fakes_) {
@@ -229,9 +231,8 @@ GenEventFilter::isFake(const reco::GenJet& j, const reco::GenParticleCollection&
    std::vector<std::pair<float, const reco::GenParticle*>> ps;
    for (const auto& p: particles) {
       auto dR = deltaR(j.p4(), p.p4());
-      if (dR > 0.0001
-            and std::find(allowed.begin(), allowed.end(), abs(p.pdgId())) != allowed.end()
-            and (p.statusFlags().isPrompt() or
+      if (std::find(allowed.begin(), allowed.end(), abs(p.pdgId())) != allowed.end()
+          and (p.statusFlags().isPrompt() or
                p.isPromptFinalState() or
                p.statusFlags().isDirectPromptTauDecayProduct() or
                p.isDirectPromptTauDecayProductFinalState()))
@@ -262,26 +263,18 @@ GenEventFilter::isFake(const reco::GenJet& j, const reco::GenParticleCollection&
 bool
 GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
 {
-   int leptons = 0;
-   int jets = 0;
-   int taus = 0;
+   reco::GenParticleCollection leptons;
+   reco::GenJetCollection taus;
+   unsigned int jets = 0;
 
    edm::Handle<reco::GenParticleCollection> particles;
    event.getByToken(particle_token_, particles);
+   edm::Handle<reco::GenJetCollection> gentaus;
+   event.getByToken(jet_token_, gentaus);
    edm::Handle<reco::GenJetCollection> genjets;
    event.getByToken(jet_token_, genjets);
 
    for (const auto& p: *particles) {
-      if (abs(p.pdgId()) == 15) {
-         bool leptonic = false;
-         for (unsigned int i = 0; i < p.numberOfDaughters(); ++i) {
-            auto d = p.daughter(i);
-            if (d and std::find(lepton_ids_.begin(), lepton_ids_.end(), abs(d->pdgId())) != lepton_ids_.end())
-               leptonic = true;
-         }
-         if ((not leptonic) and p.pt() > tau_pt_ and abs(p.eta()) < tau_eta_)
-            ++taus;
-      }
       auto it = std::find(lepton_ids_.begin(), lepton_ids_.end(), abs(p.pdgId()));
       auto idx = std::distance(lepton_ids_.begin(), it);
       if (idx >= (int) lepton_ids_.size())
@@ -291,22 +284,59 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
          continue;
 
       // auto m = mother(p);
-      ++leptons;
+      leptons.push_back(p);
    }
 
-   jets = std::count_if(std::begin(*genjets), std::end(*genjets),
-         [&](const auto& j) { return j.pt() > jet_pt_ and abs(j.eta()) < jet_eta_; });
+   for (const auto& t: *gentaus) {
+      bool overlap = false;
+      for (const auto& l: leptons) {
+         if (deltaR(l.p4(), t.p4()) < .1) {
+            overlap = true;
+            break;
+         }
+      }
+
+      if (not overlap and t.pt() > tau_pt_ and abs(t.eta()) < tau_eta_)
+         taus.push_back(t);
+   }
+
+   reco::GenJetCollection cleanjets;
+   for (const auto& j: *genjets) {
+      bool overlap = false;
+      for (const auto& l: leptons) {
+         if (deltaR(l.p4(), j.p4()) < .1) {
+            overlap = true;
+            break;
+         }
+      }
+
+      if (not overlap)
+         cleanjets.push_back(j);
+   }
 
    if (use_fakes_)
-      taus += std::count_if(std::begin(*genjets), std::end(*genjets),
+      std::copy_if(std::begin(cleanjets), std::end(cleanjets), std::back_inserter(taus),
             [&](const auto& j) { return this->isFake(j, *particles); });
 
+   for (const auto& j: cleanjets) {
+      bool overlap = false;
+      for (const auto& t: taus) {
+         if (deltaR(t.p4(), j.p4()) < .1) {
+            overlap = true;
+            break;
+         }
+      }
+
+      if (not overlap)
+         ++jets;
+   }
+
    return (
-         leptons + jets + taus >= total_count_ and
-         leptons + taus >= total_lepton_count_ and
-         leptons >= lepton_count_ and
+         leptons.size() + taus.size() + jets >= total_count_ and
+         leptons.size() + taus.size() >= total_lepton_count_ and
+         leptons.size() >= lepton_count_ and
          jets >= jet_count_ and
-         taus >= tau_count_
+         taus.size() >= tau_count_
    );
 }
 

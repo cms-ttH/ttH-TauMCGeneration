@@ -2,9 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 
 def customizeForGenFiltering(process):
-    process.load("PhysicsTools.JetMCAlgos.TauGenJets_cfi")
     process.load("ttH.TauMCGeneration.eventFilter_cfi")
-    process.ttHfilter = cms.Sequence(process.tauGenJets + process.ttHGenFilter)
     for path in process.paths:
         if path in ['lhe_step', 'digitisation_step']:
             continue

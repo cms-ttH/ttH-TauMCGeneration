@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+from PhysicsTools.JetMCAlgos.TauGenJets_cfi import tauGenJets
+
 ttHGenFilter = cms.EDFilter(
     "GenEventFilter",
     genParticles=cms.InputTag('genParticles'),
@@ -20,3 +22,5 @@ ttHGenFilter = cms.EDFilter(
     minTotal=cms.int32(6),
     minTotalLeptons=cms.int32(1)
 )
+
+ttHfilter = cms.Sequence(tauGenJets + ttHGenFilter)

@@ -7,12 +7,12 @@ version = 'v0'
 
 storage = StorageConfiguration(
     output=[
-        "hdfs://eddie.crc.nd.edu:19000/store/user/matze/lobster_mc_" + version,
-        "file:///hadoop/store/user/matze/lobster_mc_" + version,
-        "root://deepthought.crc.nd.edu//store/user/matze/lobster_mc_" + version,
-        "chirp://eddie.crc.nd.edu:9094/store/user/matze/lobster_test_" + version,
-        "gsiftp://T3_US_NotreDame/store/user/matze/lobster_mc_" + version,
-        "srm://T3_US_NotreDame/store/user/matze/lobster_mc_" + version,
+        "hdfs://eddie.crc.nd.edu:19000/store/user/matze/ttH/fastsim_" + version,
+        "file:///hadoop/store/user/matze/ttH/fastsim_" + version,
+        "root://deepthought.crc.nd.edu//store/user/matze/ttH/fastsim_" + version,
+        "chirp://eddie.crc.nd.edu:9094/store/user/matze/ttH/fastsim_" + version,
+        "gsiftp://T3_US_NotreDame/store/user/matze/ttH/fastsim_" + version,
+        "srm://T3_US_NotreDame/store/user/matze/ttH/fastsim_" + version,
     ]
 )
 

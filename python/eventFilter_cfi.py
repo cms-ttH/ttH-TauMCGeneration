@@ -15,13 +15,13 @@ ttHGenFilter = cms.EDFilter(
     jetEta=cms.double(2.7),
     tauPt=cms.double(18),
     tauEta=cms.double(2.7),
-    useFakeTaus=cms.bool(False),
+    useFakeTaus=cms.bool(True),
     fakeCut=cms.double(0.),
     minLeptons=cms.int32(1),
     minJets=cms.int32(0),
     minTaus=cms.int32(0),
     minTotal=cms.int32(6),
-    minTotalLeptons=cms.int32(1)
+    minTotalLeptons=cms.int32(2)
 )
 
 ttHfilter = cms.Sequence(tauGenJets + ttHGenFilter)

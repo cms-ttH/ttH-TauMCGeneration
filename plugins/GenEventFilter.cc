@@ -337,7 +337,7 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
          }
       }
 
-      if (not overlap)
+      if (not overlap and j.pt() > jet_pt_ and abs(j.eta()) < jet_eta_)
          ++jets;
    }
 

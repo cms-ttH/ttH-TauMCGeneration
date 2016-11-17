@@ -2,7 +2,7 @@
 //
 // Package:    ttH/TauRoast
 // Class:      GenEventFilter
-// 
+//
 /**\class TauRoast GenEventFilter.cc ttH/TauRoast/plugins/GenEventFilter.cc
 
  Description: [one line class summary]
@@ -285,7 +285,7 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
 
       if (not (p.pt() > lepton_pt_[idx] and abs(p.eta()) < lepton_eta_[idx]))
          continue;
- 
+
       // auto m = mother(p);
       leptons.push_back(p);
       if (p.pt() > lepton_pt_lead_[idx])
@@ -294,10 +294,9 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
 
    if (leptons.size() < lepton_count_)
       return false;
-      
+
     if (lepton_count_ >= 1 && leptons_lead.size() < 1)
       return false;
-      
 
    for (const auto& t: *gentaus) {
       bool overlap = false;
@@ -357,13 +356,13 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
 }
 
 // ------------ method called once each job just before starting event loop  ------------
-void 
+void
 GenEventFilter::beginJob()
 {
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
-void 
+void
 GenEventFilter::endJob() {
 }
 

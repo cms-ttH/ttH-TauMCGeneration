@@ -74,6 +74,7 @@ class GenEventFilter : public edm::EDFilter {
       double tau_eta_;
 
       bool use_fakes_;
+      bool use_fake_mva_;
       double fake_cut_;
 
       unsigned int lepton_count_;
@@ -119,6 +120,7 @@ GenEventFilter::GenEventFilter(const edm::ParameterSet& config) :
    tau_pt_(config.getParameter<double>("tauPt")),
    tau_eta_(config.getParameter<double>("tauEta")),
    use_fakes_(config.getParameter<bool>("useFakeTaus")),
+   use_fake_mva_(config.getParameter<bool>("useFakeTauMVA")),
    fake_cut_(config.getParameter<double>("fakeCut")),
    lepton_count_(config.getParameter<int>("minLeptons")),
    jet_count_(config.getParameter<int>("minJets")),
@@ -130,7 +132,7 @@ GenEventFilter::GenEventFilter(const edm::ParameterSet& config) :
    tau_token_ = consumes<reco::GenJetCollection>(config.getParameter<edm::InputTag>("genTaus"));
    jet_token_ = consumes<reco::GenJetCollection>(config.getParameter<edm::InputTag>("genJets"));
 
-   if (use_fakes_) {
+   if (use_fake_mva_) {
       reader_.reset(new TMVA::Reader());
       reader_->AddVariable("pt", &mva_pt_);
       reader_->AddVariable("chargedPt", &mva_charged_pt_);
@@ -258,7 +260,9 @@ GenEventFilter::isFake(const reco::GenJet& j, const reco::GenParticleCollection&
    if (mva_constituents_ > 19 or mva_charged_constituents_ > 9 or mva_iso_constituents_ > 11)
       return false;
 
-   return reader_->EvaluateMVA("BDTG") > fake_cut_;
+   if (use_fake_mva_)
+      return reader_->EvaluateMVA("BDTG") > fake_cut_;
+   return true;
 }
 
 // ------------ method called on each new Event  ------------

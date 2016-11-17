@@ -63,6 +63,7 @@ class GenEventFilter : public edm::EDFilter {
       edm::EDGetTokenT<reco::GenJetCollection> jet_token_;
 
       std::vector<int> lepton_ids_;
+      std::vector<double> lepton_pt_lead_;
       std::vector<double> lepton_pt_;
       std::vector<double> lepton_eta_;
 
@@ -110,6 +111,7 @@ class GenEventFilter : public edm::EDFilter {
 //
 GenEventFilter::GenEventFilter(const edm::ParameterSet& config) :
    lepton_ids_(config.getParameter<std::vector<int>>("leptonID")),
+   lepton_pt_lead_(config.getParameter<std::vector<double>>("leptonPtLead")),
    lepton_pt_(config.getParameter<std::vector<double>>("leptonPt")),
    lepton_eta_(config.getParameter<std::vector<double>>("leptonEta")),
    jet_pt_(config.getParameter<double>("jetPt")),
@@ -264,6 +266,7 @@ bool
 GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
 {
    reco::GenParticleCollection leptons;
+   reco::GenParticleCollection leptons_lead;
    reco::GenJetCollection taus;
    unsigned int jets = 0;
 
@@ -282,13 +285,19 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
 
       if (not (p.pt() > lepton_pt_[idx] and abs(p.eta()) < lepton_eta_[idx]))
          continue;
-
+ 
       // auto m = mother(p);
       leptons.push_back(p);
+      if (p.pt() > lepton_pt_lead_[idx])
+        leptons_lead.push_back(p);
    }
 
    if (leptons.size() < lepton_count_)
       return false;
+      
+    if (lepton_count_ >= 1 && leptons_lead.size() < 1)
+      return false;
+      
 
    for (const auto& t: *gentaus) {
       bool overlap = false;

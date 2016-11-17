@@ -270,7 +270,7 @@ GenEventFilter::filter(edm::Event& event, const edm::EventSetup& setup)
    edm::Handle<reco::GenParticleCollection> particles;
    event.getByToken(particle_token_, particles);
    edm::Handle<reco::GenJetCollection> gentaus;
-   event.getByToken(jet_token_, gentaus);
+   event.getByToken(tau_token_, gentaus);
    edm::Handle<reco::GenJetCollection> genjets;
    event.getByToken(jet_token_, genjets);
 

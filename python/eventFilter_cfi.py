@@ -16,10 +16,11 @@ ttHGenFilter = cms.EDFilter(
     tauPt=cms.double(18),
     tauEta=cms.double(2.7),
     useFakeTaus=cms.bool(True),
+    useFakeTauMVA=cms.bool(False),
     fakeCut=cms.double(0.),
     minLeptons=cms.int32(1),
     minJets=cms.int32(0),
-    minTaus=cms.int32(0),
+    minTaus=cms.int32(1),
     minTotal=cms.int32(6),
     minTotalLeptons=cms.int32(2)
 )

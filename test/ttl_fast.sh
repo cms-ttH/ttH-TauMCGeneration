@@ -36,9 +36,25 @@ mk_cfg() {
    config=${config//-/_}
 
    cmsDriver.py Configuration/GenProduction/$config \
+      -n 5000 \
+      --python_filename fast_${sample}_lhe.py \
+      --fileout file:fast_${sample}_lhe.root \
+      --mc \
+      --eventcontent LHE \
+      --datatier LHE \
+      --fast \
+      --conditions 80X_mcRun2_asymptotic_v14 \
+      --beamspot Realistic50ns13TeVCollision \
+      --step LHE \
+      --era Run2_25ns \
+      --no_exec \
+
+
+   cmsDriver.py Configuration/GenProduction/$config \
       -n 500 \
       --python_filename fast_${sample}_aod.py \
       --fileout file:fast_${sample}_aod.root \
+      --filein file:fast_${sample}_lhe.root \
       --pileup_input "dbs:/Neutrino_E-10_gun/RunIISpring16FSPremix-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/GEN-SIM-DIGI-RAW" \
       --mc \
       --eventcontent AODSIM \
@@ -48,7 +64,7 @@ mk_cfg() {
       --datatier AODSIM \
       --conditions 80X_mcRun2_asymptotic_v14 \
       --beamspot Realistic50ns13TeVCollision \
-      --step LHE,GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:25ns10e33_v2 \
+      --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:25ns10e33_v2 \
       --datamix PreMix \
       --era Run2_25ns \
       --no_exec \

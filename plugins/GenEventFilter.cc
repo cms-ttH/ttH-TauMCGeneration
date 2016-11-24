@@ -257,7 +257,7 @@ GenEventFilter::isFake(const reco::GenJet& j, const reco::GenParticleCollection&
    if (fabs(j.eta()) > 2.5)
       return false;
 
-   if (mva_constituents_ > 22 or mva_charged_constituents_ > 11
+   if (mva_constituents_ > 22 or mva_charged_constituents_ > 10
          or mva_signal_charged_constituents_ > 5)
       return false;
 

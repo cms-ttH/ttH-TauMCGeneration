@@ -47,8 +47,7 @@ mk_cfg() {
       --beamspot Realistic50ns13TeVCollision \
       --step LHE \
       --era Run2_25ns \
-      --no_exec \
-
+      --no_exec
 
    cmsDriver.py Configuration/GenProduction/$config \
       -n 500 \
@@ -67,7 +66,7 @@ mk_cfg() {
       --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:25ns10e33_v2 \
       --datamix PreMix \
       --era Run2_25ns \
-      --no_exec \
+      --no_exec
 
    cmsDriver.py \
       -n 500 \

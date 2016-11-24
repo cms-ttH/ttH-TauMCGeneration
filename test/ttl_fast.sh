@@ -84,6 +84,7 @@ for smpl in "${!setups[@]}"; do
    cfg="${setups[$smpl]}"
    fltr="--customise ttH/TauMCGeneration/customGenFilter.customizeForGenFilteringWithFakes"
 
-   mk_cfg $smpl $cfg ""
-   mk_cfg ${smpl}_filtered $cfg "$fltr"
+   # mk_cfg $smpl $cfg ""
+   # mk_cfg ${smpl}_filtered $cfg "$fltr"
+   mk_cfg ${smpl} $cfg "$fltr"
 done

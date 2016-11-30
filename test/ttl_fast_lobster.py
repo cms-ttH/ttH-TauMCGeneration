@@ -1,7 +1,7 @@
 from lobster.core import AdvancedOptions, Category, Config, StorageConfiguration, Workflow
 from lobster.core import ParentDataset, ProductionDataset
 
-version = 'v1'
+version = 'v2'
 
 storage = StorageConfiguration(
     output=[
@@ -19,12 +19,12 @@ workflows = []
 
 for dset in datasets:
     lhe = Workflow(
-        label=dset + '_lhe',
+        label=dset.replace('fast_', '') + '_lhe',
         pset=dset + '_lhe.py',
         dataset=ProductionDataset(
-            events_per_task=50000,
+            events_per_task=10000,
             events_per_lumi=1000,
-            number_of_tasks=100
+            number_of_tasks=500
         ),
         category=Category(
             name='lhe',
@@ -35,7 +35,7 @@ for dset in datasets:
     )
 
     aod = Workflow(
-        label=dset + '_aod',
+        label=dset.replace('fast_', '') + '_aod',
         pset=dset + '_aod.py',
         dataset=ParentDataset(
             parent=lhe,
@@ -51,7 +51,7 @@ for dset in datasets:
     )
 
     maod = Workflow(
-        label=dset + '_maod',
+        label=dset.replace('fast_', '') + '_maod',
         pset=dset + '_maod.py',
         merge_size='2000M',
         cleanup_input=True,
@@ -71,6 +71,7 @@ for dset in datasets:
     workflows.extend([lhe, aod, maod])
 
 config = Config(
+    label='faster_' + version,
     workdir='/tmpscratch/users/matze/ttH/fastsim_' + version,
     plotdir='~/www/lobster/ttH/fastsim_' + version,
     storage=storage,

@@ -23,6 +23,6 @@ def customizeForGenFilteringWithFakes(process):
     process = customizeForGenFiltering(process)
     process.ttHGenFilter.useFakeTaus = cms.bool(True)
     process.ttHGenFilter.useFakeTauMVA = cms.bool(True)
-    process.ttHGenFilter.minTaus = cms.int32(1)
-    process.ttHGenFilter.minTotalLeptons = cms.int32(2)
+    process.ttHGenFilter.minTaus = cms.int32(0)
+    process.ttHGenFilter.minTotalLeptons = cms.int32(3)
     return process

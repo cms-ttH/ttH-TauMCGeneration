@@ -1,7 +1,10 @@
 set -e
 set -x
 
-release=CMSSW_8_0_14
+era=Run2_2016
+release=CMSSW_8_0_21
+globaltag=80X_mcRun2_asymptotic_2016_TrancheIV_v6
+premix=/Neutrino_E-10_gun/RunIISummer16FSPremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/GEN-SIM-DIGI-RAW
 
 declare -A setups
 
@@ -36,47 +39,47 @@ mk_cfg() {
    config=${config//-/_}
 
    cmsDriver.py Configuration/GenProduction/$config \
-      -n 5000 \
-      --python_filename fast_${sample}_lhe.py \
-      --fileout file:fast_${sample}_lhe.root \
+      -n 100 \
+      --python_filename ${sample}_lhe.py \
+      --fileout file:${sample}_lhe.root \
       --mc \
       --eventcontent LHE \
       --datatier LHE \
       --fast \
-      --conditions 80X_mcRun2_asymptotic_v14 \
+      --conditions $globaltag \
       --beamspot Realistic50ns13TeVCollision \
       --step LHE \
-      --era Run2_25ns \
+      --era $era \
       --no_exec
 
    cmsDriver.py Configuration/GenProduction/$config \
-      -n 500 \
-      --python_filename fast_${sample}_aod.py \
-      --fileout file:fast_${sample}_aod.root \
-      --filein file:fast_${sample}_lhe.root \
-      --pileup_input "dbs:/Neutrino_E-10_gun/RunIISpring16FSPremix-PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/GEN-SIM-DIGI-RAW" \
+      -n 100 \
+      --python_filename ${sample}_aod.py \
+      --fileout file:${sample}_aod.root \
+      --filein file:${sample}_lhe.root \
+      --pileup_input "dbs:$premix" \
       --mc \
       --eventcontent AODSIM \
       --fast \
       --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput \
       $filter \
       --datatier AODSIM \
-      --conditions 80X_mcRun2_asymptotic_v14 \
+      --conditions $globaltag \
       --beamspot Realistic50ns13TeVCollision \
-      --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:25ns10e33_v2 \
+      --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 \
       --datamix PreMix \
-      --era Run2_25ns \
+      --era $era \
       --no_exec
 
    cmsDriver.py \
-      -n 500 \
-      --python_filename fast_${sample}_maod.py \
-      --fileout file:fast_${sample}_maod.root \
-      --filein file:fast_${sample}_aod.root \
+      -n 100 \
+      --python_filename ${sample}_maod.py \
+      --fileout file:${sample}_maod.root \
+      --filein file:${sample}_aod.root \
       --mc --eventcontent MINIAODSIM --fast \
-      --datatier MINIAODSIM --conditions 80X_mcRun2_asymptotic_v14 \
+      --datatier MINIAODSIM --conditions $globaltag \
       --step PAT --runUnscheduled \
-      --era Run2_25ns \
+      --era $era \
       --no_exec
 }
 

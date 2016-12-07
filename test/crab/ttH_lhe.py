@@ -1,11 +1,12 @@
 from WMCore.Configuration import Configuration
 
+step = 'lhe'
 part = 'p5'
 
 config = Configuration()
 
 config.section_('General')
-config.General.requestName = 'ttH_lhe_' + part
+config.General.requestName = '_'.join('ttH', step, part)
 
 config.section_('JobType')
 config.JobType.pluginName = 'PrivateMC'
@@ -17,7 +18,7 @@ config.Data.splitting = 'EventBased'
 config.Data.unitsPerJob = 1000
 config.Data.totalUnits = 10 * 1000 * 1000
 config.Data.publication = True
-config.Data.outputDatasetTag = 'v1' + part
+config.Data.outputDatasetTag = '{}_v1{}'.format(step, part)
 
 config.section_('Site')
 config.Site.storageSite = 'T2_EE_Estonia'

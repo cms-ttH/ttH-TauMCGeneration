@@ -17,21 +17,21 @@ args = p.parse_args()
 statii = [crabCommand('status', dir=wd) for wd in args.workdirs]
 
 totals = [sum(s['jobsPerStatus'].values()) for s in statii]
-failed = [s['jobsPerStatus']['failed'] for s in statii]
-finished = [s['jobsPerStatus']['finished'] for s in statii]
-running = [s['jobsPerStatus']['running'] for s in statii]
+failed = [s['jobsPerStatus'].get('failed', 0) for s in statii]
+finished = [s['jobsPerStatus'].get('finished', 0) for s in statii]
+running = [s['jobsPerStatus'].get('running', 0) for s in statii]
 
 for wd, t, f, d, r in zip(args.workdirs, totals, failed, finished, running):
     print "{:30}failed:   {:5.2f} ({:5d}/{:5d})".format(wd, float(f) / t, f, t)
     print "{:30}running:  {:5.2f} ({:5d}/{:5d})".format('', float(r) / t, r, t)
     print "{:30}finished: {:5.2f} ({:5d}/{:5d})".format('', float(d) / t, d, t)
+    print "-" * 59
 
 ntotal = sum(totals)
 nfailed = sum(failed)
 nfinished = sum(finished)
 nrunning = sum(running)
 
-print "-" * 59
 print "{:30}failed:   {:5.2f} ({:5d}/{:5d})".format('total', float(nfailed) / ntotal, nfailed, ntotal)
 print "{:30}running:  {:5.2f} ({:5d}/{:5d})".format('', float(nrunning) / ntotal, nrunning, ntotal)
 print "{:30}finished: {:5.2f} ({:5d}/{:5d})".format('', float(nfinished) / ntotal, nfinished, ntotal)
@@ -41,5 +41,7 @@ print
 
 for wd, status in zip(args.workdirs, statii):
     jobs = [str(v) for k, v in status['jobList'] if k == u'failed']
+    if len(jobs) == 0:
+        continue
     print "{:30}resubmitting: {}".format(wd, jobs)
     crabCommand('resubmit', jobids=','.join(jobs), dir=wd)

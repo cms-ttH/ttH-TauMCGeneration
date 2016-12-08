@@ -10,6 +10,7 @@ from httplib import HTTPException
 setConsoleLogLevel(100)
 
 p = argparse.ArgumentParser('grudgingly manage many crab tasks')
+p.add_argument('--resubmit', type=bool, help='resubmit failed jobs')
 p.add_argument('workdirs', nargs='*')
 
 args = p.parse_args()
@@ -36,12 +37,11 @@ print "{:30}failed:   {:5.2f} ({:5d}/{:5d})".format('total', float(nfailed) / nt
 print "{:30}running:  {:5.2f} ({:5d}/{:5d})".format('', float(nrunning) / ntotal, nrunning, ntotal)
 print "{:30}finished: {:5.2f} ({:5d}/{:5d})".format('', float(nfinished) / ntotal, nfinished, ntotal)
 
-print
-
-
-for wd, status in zip(args.workdirs, statii):
-    jobs = [str(v) for k, v in status['jobList'] if k == u'failed']
-    if len(jobs) == 0:
-        continue
-    print "{:30}resubmitting: {}".format(wd, jobs)
-    crabCommand('resubmit', jobids=','.join(jobs), dir=wd)
+if args.resubmit:
+    print
+    for wd, status in zip(args.workdirs, statii):
+        jobs = [str(v) for k, v in status['jobList'] if k == u'failed']
+        if len(jobs) == 0:
+            continue
+        print "{:30}resubmitting: {}".format(wd, jobs)
+        crabCommand('resubmit', jobids=','.join(jobs), dir=wd)

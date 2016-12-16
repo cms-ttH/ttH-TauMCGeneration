@@ -6,7 +6,7 @@ part = 'p1'
 config = Configuration()
 
 config.section_('General')
-config.General.requestName = '_'.join('ttjets_sl', step, part)
+config.General.requestName = '_'.join(['ttjets_sl', step, part])
 
 config.section_('JobType')
 config.JobType.pluginName = 'PrivateMC'

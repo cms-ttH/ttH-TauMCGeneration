@@ -6,7 +6,7 @@ part = 'p5'
 config = Configuration()
 
 config.section_('General')
-config.General.requestName = '_'.join('ttH', step, part)
+config.General.requestName = '_'.join(['ttH', step, part])
 
 config.section_('JobType')
 config.JobType.pluginName = 'PrivateMC'

@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 
 step = 'lhe'
-part = 'p1'
+part = 'p4'
 
 config = Configuration()
 
@@ -17,7 +17,7 @@ config.section_('Data')
 config.Data.outputPrimaryDataset = 'TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8'
 config.Data.splitting = 'EventBased'
 config.Data.unitsPerJob = 50 * 1000
-config.Data.totalUnits = 50 * 1000 * 1000
+config.Data.totalUnits = 200 * 1000 * 1000
 config.Data.publication = True
 config.Data.outputDatasetTag = '{}_v1{}'.format(step, part)
 

@@ -10,7 +10,7 @@ config.General.requestName = '_'.join(['ttjets_sl', step, part])
 
 config.section_('JobType')
 config.JobType.pluginName = 'Analysis'
-config.JobType.psetName = 'configs/ttjets_sl_lhe.py'
+config.JobType.psetName = 'configs/ttjets_sl_{}.py'.format(step)
 
 config.section_('Data')
 config.Data.inputDataset = '/TTToSemilepton_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/matze-lhe_v1p1-164100aee9d533c58d264867cf4a454c/USER'

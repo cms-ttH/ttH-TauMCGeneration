@@ -1,7 +1,7 @@
 from lobster.core import AdvancedOptions, Category, Config, StorageConfiguration, Workflow
 from lobster.core import ParentDataset, ProductionDataset
 
-version = 'v5'
+version = 'v6'
 
 storage = StorageConfiguration(
     output=[
@@ -16,7 +16,7 @@ storage = StorageConfiguration(
 
 datasets = ['ttH', 'ttjets_sl', 'ttjets_dl']
 tasksizes = [200, 10000, 10000]
-events = [10e6, 100e6, 50e6]
+events = [20e6, 200e6, 100e6]
 
 workflows = []
 
@@ -34,7 +34,7 @@ for dset, tasksize, events in zip(datasets, tasksizes, events):
         ),
         category=Category(
             name='lhe',
-            cores=1,
+            cores=2,
             disk=2000,
             memory=2000
         )
@@ -49,7 +49,7 @@ for dset, tasksize, events in zip(datasets, tasksizes, events):
         ),
         category=Category(
             name='aod',
-            cores=1,
+            cores=2,
             disk=1000,
             memory=3000,
             runtime=120 * 60
@@ -67,7 +67,7 @@ for dset, tasksize, events in zip(datasets, tasksizes, events):
         ),
         category=Category(
             name='maod',
-            cores=1,
+            cores=2,
             disk=4000,
             memory=2000,
             runtime=90 * 60

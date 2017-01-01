@@ -15,17 +15,29 @@ p.add_argument('workdirs', nargs='*')
 
 args = p.parse_args()
 
-statii = [crabCommand('status', dir=wd) for wd in args.workdirs]
+statii = []
+for wd in args.workdirs:
+    try:
+        status = crabCommand('status', dir=wd)
+        if len(status) == 0:
+            print "no status for {}".format(wd)
+        statii.append(status)
+    except Exception:
+        print "error retrieving status for {}".format(wd)
+        statii.append({})
 
-totals = [sum(s['jobsPerStatus'].values()) for s in statii]
-failed = [s['jobsPerStatus'].get('failed', 0) for s in statii]
-finished = [s['jobsPerStatus'].get('finished', 0) for s in statii]
-running = [s['jobsPerStatus'].get('running', 0) for s in statii]
+totals = [sum(s.get('jobsPerStatus', {}).values()) for s in statii]
+failed = [s.get('jobsPerStatus', {}).get('failed', 0) for s in statii]
+finished = [s.get('jobsPerStatus', {}).get('finished', 0) for s in statii]
+running = [s.get('jobsPerStatus', {}).get('running', 0) for s in statii]
 
 for wd, t, f, d, r in zip(args.workdirs, totals, failed, finished, running):
-    print "{:30}failed:   {:5.2f} ({:5d}/{:5d})".format(wd, float(f) / t, f, t)
-    print "{:30}running:  {:5.2f} ({:5d}/{:5d})".format('', float(r) / t, r, t)
-    print "{:30}finished: {:5.2f} ({:5d}/{:5d})".format('', float(d) / t, d, t)
+    try:
+        print "{:30}failed:   {:5.2f} ({:5d}/{:5d})".format(wd, float(f) / t, f, t)
+        print "{:30}running:  {:5.2f} ({:5d}/{:5d})".format('', float(r) / t, r, t)
+        print "{:30}finished: {:5.2f} ({:5d}/{:5d})".format('', float(d) / t, d, t)
+    except Exception:
+        print "error processing {}".format(wd)
     print "-" * 59
 
 ntotal = sum(totals)
@@ -40,8 +52,11 @@ print "{:30}finished: {:5.2f} ({:5d}/{:5d})".format('', float(nfinished) / ntota
 if args.resubmit:
     print
     for wd, status in zip(args.workdirs, statii):
-        jobs = [str(v) for k, v in status['jobList'] if k == u'failed']
+        jobs = [str(v) for k, v in status.get('jobList', {}) if k == u'failed']
         if len(jobs) == 0:
             continue
-        print "{:30}resubmitting: {}".format(wd, jobs)
-        crabCommand('resubmit', jobids=','.join(jobs), dir=wd)
+        try:
+            print "{:30}resubmitting: {}".format(wd, jobs)
+            crabCommand('resubmit', jobids=','.join(jobs), dir=wd)
+        except Exception:
+            print "error resubmitting {}".format(wd)

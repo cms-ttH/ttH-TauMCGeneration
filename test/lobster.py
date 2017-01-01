@@ -1,7 +1,9 @@
+from lobster import cmssw
+
 from lobster.core import AdvancedOptions, Category, Config, StorageConfiguration, Workflow
 from lobster.core import ParentDataset, ProductionDataset
 
-version = 'v6'
+version = 'v7'
 
 storage = StorageConfiguration(
     output=[
@@ -37,7 +39,11 @@ for dset, tasksize, events in zip(datasets, tasksizes, events):
             cores=2,
             disk=2000,
             memory=2000
-        )
+        ),
+        sandbox=[
+            cmssw.Sandbox(release='/afs/crc.nd.edu/user/m/mwolf3/work/ttH/mcgen/moriond17_part1/CMSSW_8_0_21'),
+            cmssw.Sandbox(release='/afs/crc.nd.edu/user/m/mwolf3/work/ttH/mcgen/moriond17_part1_rh7/CMSSW_8_0_21')
+        ]
     )
 
     aod = Workflow(
@@ -53,7 +59,11 @@ for dset, tasksize, events in zip(datasets, tasksizes, events):
             disk=1000,
             memory=3000,
             runtime=120 * 60
-        )
+        ),
+        sandbox=[
+            cmssw.Sandbox(release='/afs/crc.nd.edu/user/m/mwolf3/work/ttH/mcgen/moriond17_part1/CMSSW_8_0_21'),
+            cmssw.Sandbox(release='/afs/crc.nd.edu/user/m/mwolf3/work/ttH/mcgen/moriond17_part1_rh7/CMSSW_8_0_21')
+        ]
     )
 
     maod = Workflow(
@@ -71,7 +81,11 @@ for dset, tasksize, events in zip(datasets, tasksizes, events):
             disk=4000,
             memory=2000,
             runtime=90 * 60
-        )
+        ),
+        sandbox=[
+            cmssw.Sandbox(release='/afs/crc.nd.edu/user/m/mwolf3/work/ttH/mcgen/moriond17_part1/CMSSW_8_0_21'),
+            cmssw.Sandbox(release='/afs/crc.nd.edu/user/m/mwolf3/work/ttH/mcgen/moriond17_part1_rh7/CMSSW_8_0_21')
+        ]
     )
 
     workflows.extend([lhe, aod, maod])

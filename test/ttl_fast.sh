@@ -11,6 +11,9 @@ declare -A setups
 setups[ttH]=python/HIG-RunIISummer15wmLHEGS-00484-fragment.py
 setups[ttjets_dl]=python/HIG-RunIISummer15wmLHEGS-00481-fragment.py
 setups[ttjets_sl]=python/HIG-RunIISummer15wmLHEGS-00482-fragment.py
+setups[WZ]=python/SMP-RunIIWinter15wmLHE-00019-fragment.py
+setups[ttW]=python/TOP-RunIISummer15wmLHEGS-00012-fragment.py
+setups[ttZ]=python/TOP-RunIISummer15wmLHEGS-00013-fragment.py
 
 scram p CMSSW $release
 cd $release/src
@@ -30,6 +33,8 @@ git clone git@github.com:cms-ttH/ttH-TauMCGeneration.git ttH/TauMCGeneration
 eval `scram runtime -sh`
 scram b
 cd ../..
+
+das_client.py --limit=0 --query="file dataset=$premix" > pufiles.txt
 
 mk_cfg() {
    sample=$1
@@ -57,7 +62,7 @@ mk_cfg() {
       --python_filename ${sample}_aod.py \
       --fileout file:${sample}_aod.root \
       --filein file:${sample}_lhe.root \
-      --pileup_input "dbs:$premix" \
+      --pileup_input "[]" \
       --mc \
       --eventcontent AODSIM \
       --fast \
@@ -71,6 +76,12 @@ mk_cfg() {
       --era $era \
       --no_exec
 
+   cat <<EOF >>${sample}_aod.py
+process.mixData.input.fileNames = cms.untracked.vstring([])
+with open('pufiles.txt') as fd:
+    for line in fd:
+       process.mixData.input.fileNames.append(line.strip())
+EOF
    cmsDriver.py \
       -n 100 \
       --python_filename ${sample}_maod.py \

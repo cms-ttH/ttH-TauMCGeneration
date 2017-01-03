@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00484_fragment.py -n 2000 --python_filename ttH_lhe.py --fileout file:ttH_lhe.root --mc --eventcontent LHE --datatier LHE --fast --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step LHE --era Run2_2016 --no_exec
+# with command line options: Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00484_fragment.py -n 100 --python_filename ttH_lhe.py --fileout file:ttH_lhe.root --mc --eventcontent LHE --datatier LHE --fast --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step LHE --era Run2_2016 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -21,7 +21,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(2000)
+    input = cms.untracked.int32(100)
 )
 
 # Input source
@@ -33,7 +33,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00484_fragment.py nevts:2000'),
+    annotation = cms.untracked.string('Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00484_fragment.py nevts:100'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -59,7 +59,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_Tra
 
 process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
     args = cms.vstring('/cvmfs/cms.cern.ch/phys_generator/gridpacks/slc6_amd64_gcc481/13TeV/powheg/V2/ttH_inclusive_NNPDF30_13TeV_M125/v5/ttH_inclusive_NNPDF30_13TeV_M125_tarball.tgz'),
-    nEvents = cms.untracked.uint32(2000),
+    nEvents = cms.untracked.uint32(100),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),
     scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')

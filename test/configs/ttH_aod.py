@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00484_fragment.py -n 100 --python_filename ttH_aod.py --fileout file:ttH_aod.root --filein file:ttH_lhe.root --pileup_input dbs:/Neutrino_E-10_gun/RunIISummer16FSPremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/GEN-SIM-DIGI-RAW --mc --eventcontent AODSIM --fast --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput --customise ttH/TauMCGeneration/customGenFilter.customizeForGenFilteringWithFakes --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 --datamix PreMix --era Run2_2016 --no_exec
+# with command line options: Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00484_fragment.py -n 100 --python_filename ttH_aod.py --fileout file:ttH_aod.root --filein file:ttH_lhe.root --pileup_input [] --mc --eventcontent AODSIM --fast --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput --customise ttH/TauMCGeneration/customGenFilter.customizeForGenFilteringWithFakes --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 --datamix PreMix --era Run2_2016 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -79,7 +79,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
 # Other statements
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 process.mix.digitizers = cms.PSet(process.theDigitizersMixPreMix)
-process.mixData.input.fileNames = cms.untracked.vstring(['/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/0017BE34-529D-E611-BDC2-0025905B858C.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/00C0480E-729D-E611-A06A-0CC47A4D7694.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/00D36E3F-679D-E611-A17E-0CC47A7C361E.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/00E2297A-589D-E611-B1F5-003048FFD72C.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/021003E4-5D9D-E611-9CF8-0CC47A7C3444.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/022E25B0-519D-E611-A94F-0CC47A7C3434.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/023AABE8-729D-E611-933E-0CC47A7C3422.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/025DD53D-679D-E611-BE0E-0CC47A7C35E0.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/02A8FD3C-549D-E611-92C0-0CC47A4D7638.root', '/store/mc/RunIISummer16FSPremix/Neutrino_E-10_gun/GEN-SIM-DIGI-RAW/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/110000/02E5ACA7-579D-E611-A1B3-0CC47A4C8E98.root'])
+process.mixData.input.fileNames = cms.untracked.vstring(['[]'])
 from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v6', '')
 
@@ -175,3 +175,7 @@ process = customizeHLTforFastSim(process)
 
 # End of customisation functions
 
+process.mixData.input.fileNames = cms.untracked.vstring([])
+with open('pufiles.txt') as fd:
+    for line in fd:
+       process.mixData.input.fileNames.append(line.strip())

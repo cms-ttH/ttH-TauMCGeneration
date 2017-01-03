@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00482_fragment.py -n 100 --python_filename ttjets_sl_lhe.py --fileout file:ttjets_sl_lhe.root --mc --eventcontent LHE --datatier LHE --fast --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step LHE --era Run2_2016 --no_exec
+# with command line options: Configuration/GenProduction/python/SMP_RunIIWinter15wmLHE_00019_fragment.py -n 100 --python_filename WZ_lhe.py --fileout file:WZ_lhe.root --mc --eventcontent LHE --datatier LHE --fast --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step LHE --era Run2_2016 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -33,7 +33,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00482_fragment.py nevts:100'),
+    annotation = cms.untracked.string('Configuration/GenProduction/python/SMP_RunIIWinter15wmLHE_00019_fragment.py nevts:100'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -46,7 +46,7 @@ process.LHEoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    fileName = cms.untracked.string('file:ttjets_sl_lhe.root'),
+    fileName = cms.untracked.string('file:WZ_lhe.root'),
     outputCommands = process.LHEEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -58,7 +58,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v6', '')
 
 process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
-    args = cms.vstring('/cvmfs/cms.cern.ch/phys_generator/gridpacks/slc6_amd64_gcc481/13TeV/powheg/V2/TTToSemiLepton_hvq/v1/TTToSemiLepton_hvq_ttHtranche3.tgz'),
+    args = cms.vstring('/cvmfs/cms.cern.ch/phys_generator/gridpacks/slc6_amd64_gcc481/13TeV/powheg/V2/WZTo3lNu_NNPDF30_13TeV/v1/WZTo3lNu_NNPDF30_13TeV_tarball.tar.gz'),
     nEvents = cms.untracked.uint32(100),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),

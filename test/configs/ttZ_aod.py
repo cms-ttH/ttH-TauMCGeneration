@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00481_fragment.py -n 100 --python_filename ttjets_dl_aod.py --fileout file:ttjets_dl_aod.root --filein file:ttjets_dl_lhe.root --pileup_input [] --mc --eventcontent AODSIM --fast --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput --customise ttH/TauMCGeneration/customGenFilter.customizeForGenFilteringWithFakes --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 --datamix PreMix --era Run2_2016 --no_exec
+# with command line options: Configuration/GenProduction/python/TOP_RunIISummer15wmLHEGS_00013_fragment.py -n 100 --python_filename ttZ_aod.py --fileout file:ttZ_aod.root --filein file:ttZ_lhe.root --pileup_input [] --mc --eventcontent AODSIM --fast --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput --customise ttH/TauMCGeneration/customGenFilter.customizeForGenFilteringWithFakes --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 --datamix PreMix --era Run2_2016 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -40,7 +40,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:ttjets_dl_lhe.root'),
+    fileNames = cms.untracked.vstring('file:ttZ_lhe.root'),
     inputCommands = cms.untracked.vstring('keep *', 
         'drop LHEXMLStringProduct_*_*_*'),
     secondaryFileNames = cms.untracked.vstring()
@@ -52,7 +52,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('Configuration/GenProduction/python/HIG_RunIISummer15wmLHEGS_00481_fragment.py nevts:100'),
+    annotation = cms.untracked.string('Configuration/GenProduction/python/TOP_RunIISummer15wmLHEGS_00013_fragment.py nevts:100'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -70,7 +70,7 @@ process.AODSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     eventAutoFlushCompressedSize = cms.untracked.int32(15728640),
-    fileName = cms.untracked.string('file:ttjets_dl_aod.root'),
+    fileName = cms.untracked.string('file:ttZ_aod.root'),
     outputCommands = process.AODSIMEventContent.outputCommands
 )
 
@@ -86,18 +86,15 @@ process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_Tra
 process.generator = cms.EDFilter("Pythia8HadronizerFilter",
     PythiaParameters = cms.PSet(
         parameterSets = cms.vstring('pythia8CommonSettings', 
-            'pythia8PowhegEmissionVetoSettings', 
+            'pythia8CUEP8M1Settings', 
+            'pythia8aMCatNLOSettings', 
             'processParameters'),
-        processParameters = cms.vstring('POWHEG:nFinal = 2', 
-            'TimeShower:mMaxGamma = 1.0', 
-            'Tune:pp 14', 
+        processParameters = cms.vstring('TimeShower:nPartonsInBorn = 0'),
+        pythia8CUEP8M1Settings = cms.vstring('Tune:pp 14', 
             'Tune:ee 7', 
+            'MultipartonInteractions:pT0Ref=2.4024', 
             'MultipartonInteractions:ecmPow=0.25208', 
-            'SpaceShower:alphaSvalue=0.1108', 
-            'PDF:pSet=LHAPDF6:NNPDF30_lo_as_0130', 
-            'MultipartonInteractions:pT0Ref=2.034340e+00', 
-            'MultipartonInteractions:expPow=1.932600e+00', 
-            'ColourReconnection:range=5.706919e+00'),
+            'MultipartonInteractions:expPow=1.6'),
         pythia8CommonSettings = cms.vstring('Tune:preferLHAPDF = 2', 
             'Main:timesAllowErrors = 10000', 
             'Check:epTolErr = 0.01', 
@@ -107,14 +104,18 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
             'ParticleDecays:limitTau0 = on', 
             'ParticleDecays:tau0Max = 10', 
             'ParticleDecays:allowPhotonRadiation = on'),
-        pythia8PowhegEmissionVetoSettings = cms.vstring('POWHEG:veto = 1', 
-            'POWHEG:pTdef = 1', 
-            'POWHEG:emitted = 0', 
-            'POWHEG:pTemt = 0', 
-            'POWHEG:pThard = 0', 
-            'POWHEG:vetoCount = 100', 
-            'SpaceShower:pTmaxMatch = 2', 
-            'TimeShower:pTmaxMatch = 2')
+        pythia8aMCatNLOSettings = cms.vstring('SpaceShower:pTmaxMatch = 1', 
+            'SpaceShower:pTmaxFudge = 1', 
+            'SpaceShower:MEcorrections = off', 
+            'TimeShower:pTmaxMatch = 1', 
+            'TimeShower:pTmaxFudge = 1', 
+            'TimeShower:MEcorrections = off', 
+            'TimeShower:globalRecoil = on', 
+            'TimeShower:limitPTmaxGlobal = on', 
+            'TimeShower:nMaxGlobalRecoil = 1', 
+            'TimeShower:globalRecoilMode = 2', 
+            'TimeShower:nMaxGlobalBranch = 1', 
+            'TimeShower:weightGluonToQuark = 1')
     ),
     comEnergy = cms.double(13000.0),
     filterEfficiency = cms.untracked.double(1.0),
@@ -123,8 +124,6 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
     pythiaPylistVerbosity = cms.untracked.int32(1)
 )
 
-
-process.ProductionFilterSequence = cms.Sequence(process.generator)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
@@ -146,7 +145,7 @@ process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step,process.AODSIMoutput_step])
 # filter all path with the production filter sequence
 for path in process.paths:
-	getattr(process,path)._seq = process.ProductionFilterSequence * getattr(process,path)._seq 
+	getattr(process,path)._seq = process.generator * getattr(process,path)._seq 
 
 # customisation of the process.
 

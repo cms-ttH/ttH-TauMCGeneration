@@ -169,7 +169,8 @@ process = customizeHLTforFastSim(process)
 
 # End of customisation functions
 
+import os
 process.mixData.input.fileNames = cms.untracked.vstring([])
-with open('pufiles.txt') as fd:
+with open(os.path.join(os.environ['LOCALRT'], 'src/ttH/TauMCGeneration/data/pufiles.txt')) as fd:
     for line in fd:
        process.mixData.input.fileNames.append(line.strip())

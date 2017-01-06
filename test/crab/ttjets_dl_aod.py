@@ -1,7 +1,7 @@
 from WMCore.Configuration import Configuration
 
 step = 'aod'
-part = 'p1'
+part = 'p3'
 
 config = Configuration()
 
@@ -15,7 +15,7 @@ config.JobType.maxMemoryMB = 4000
 config.JobType.numCores = 2
 
 config.section_('Data')
-config.Data.inputDataset = '/TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/matze-lhe_v1p1-1c481b2669c85226f78b96c950275ca9/USER'
+config.Data.inputDataset = '/TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8/matze-lhe_v1p3-1c481b2669c85226f78b96c950275ca9/USER'
 config.Data.inputDBS = 'phys03'
 config.Data.ignoreLocality = True
 config.Data.splitting = 'LumiBased'

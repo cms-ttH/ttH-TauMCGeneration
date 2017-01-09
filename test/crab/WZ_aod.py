@@ -19,7 +19,7 @@ config.JobType.maxMemoryMB = 4000
 config.JobType.numCores = 2
 
 config.section_('Data')
-config.Data.outputPrimaryDataset = 'ttHToNonbb_M125_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8'
+config.Data.outputPrimaryDataset = 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8'
 config.Data.splitting = 'EventBased'
 config.Data.unitsPerJob = njobevents
 config.Data.totalUnits = nevents

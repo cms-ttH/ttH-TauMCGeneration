@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: Configuration/GenProduction/python/TOP_RunIISummer15wmLHEGS_00013_fragment.py -n 100 --python_filename ttZ_aod.py --fileout file:ttZ_aod.root --filein file:ttZ_lhe.root --pileup_input [] --mc --eventcontent AODSIM --fast --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput --customise ttH/TauMCGeneration/customGenFilter.customizeForGenFilteringWithFakes --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 --datamix PreMix --era Run2_2016 --no_exec
+# with command line options: Configuration/GenProduction/python/tmp_fragment.py -n 100 --python_filename ttZ_aod.py --fileout file:ttZ_aod.root --pileup_input [] --mc --eventcontent AODSIM --fast --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput --customise ttH/TauMCGeneration/customGenFilter.customizeForGenFilteringWithFakes --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --beamspot Realistic50ns13TeVCollision --step LHE,GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 --datamix PreMix --era Run2_2016 --no_exec
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.StandardSequences.Eras import eras
@@ -38,13 +38,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 
 # Input source
-process.source = cms.Source("PoolSource",
-    dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
-    fileNames = cms.untracked.vstring('file:ttZ_lhe.root'),
-    inputCommands = cms.untracked.vstring('keep *', 
-        'drop LHEXMLStringProduct_*_*_*'),
-    secondaryFileNames = cms.untracked.vstring()
-)
+process.source = cms.Source("EmptySource")
 
 process.options = cms.untracked.PSet(
 
@@ -52,7 +46,7 @@ process.options = cms.untracked.PSet(
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('Configuration/GenProduction/python/TOP_RunIISummer15wmLHEGS_00013_fragment.py nevts:100'),
+    annotation = cms.untracked.string('Configuration/GenProduction/python/tmp_fragment.py nevts:100'),
     name = cms.untracked.string('Applications'),
     version = cms.untracked.string('$Revision: 1.19 $')
 )
@@ -125,7 +119,17 @@ process.generator = cms.EDFilter("Pythia8HadronizerFilter",
 )
 
 
+process.externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
+    args = cms.vstring('/cvmfs/cms.cern.ch/phys_generator/gridpacks/slc6_amd64_gcc481/13TeV/madgraph/V5_2.2.2/TTZJets/TTZJetsToLLNuNu_5f_NLO/v1/TTZJetsToLLNuNu_5f_NLO_tarball.tar.xz'),
+    nEvents = cms.untracked.uint32(100),
+    numberOfParameters = cms.uint32(1),
+    outputFile = cms.string('cmsgrid_final.lhe'),
+    scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
+)
+
+
 # Path and EndPath definitions
+process.lhe_step = cms.Path(process.externalLHEProducer)
 process.generation_step = cms.Path(process.pgen)
 process.simulation_step = cms.Path(process.psim)
 process.reconstruction_befmix_step = cms.Path(process.reconstruction_befmix)
@@ -140,11 +144,12 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.AODSIMoutput_step = cms.EndPath(process.AODSIMoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.generation_step,process.genfiltersummary_step,process.simulation_step,process.reconstruction_befmix_step,process.digitisation_step,process.datamixing_step,process.L1simulation_step,process.digi2raw_step,process.L1Reco_step,process.reconstruction_step)
+process.schedule = cms.Schedule(process.lhe_step,process.generation_step,process.genfiltersummary_step,process.simulation_step,process.reconstruction_befmix_step,process.digitisation_step,process.datamixing_step,process.L1simulation_step,process.digi2raw_step,process.L1Reco_step,process.reconstruction_step)
 process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step,process.AODSIMoutput_step])
 # filter all path with the production filter sequence
 for path in process.paths:
+	if path in ['lhe_step']: continue
 	getattr(process,path)._seq = process.generator * getattr(process,path)._seq 
 
 # customisation of the process.
@@ -169,8 +174,8 @@ process = customizeHLTforFastSim(process)
 
 # End of customisation functions
 
-import os
 process.mixData.input.fileNames = cms.untracked.vstring([])
+import os
 with open(os.path.join(os.environ['LOCALRT'], 'src/ttH/TauMCGeneration/data/pufiles.txt')) as fd:
     for line in fd:
        process.mixData.input.fileNames.append(line.strip())

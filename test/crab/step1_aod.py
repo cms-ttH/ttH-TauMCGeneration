@@ -1,6 +1,6 @@
 from WMCore.Configuration import Configuration
 
-sample = 'ttZ'
+sample = 'ttW'
 step = 'aod'
 part = 'p1'
 
@@ -19,7 +19,7 @@ config.JobType.maxMemoryMB = 4000
 config.JobType.numCores = 2
 
 config.section_('Data')
-config.Data.outputPrimaryDataset = 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8'
+config.Data.outputPrimaryDataset = 'TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8'
 config.Data.splitting = 'EventBased'
 config.Data.unitsPerJob = njobevents
 config.Data.totalUnits = nevents
@@ -28,4 +28,4 @@ config.Data.outputDatasetTag = '{}_v1{}'.format(step, part)
 
 config.section_('Site')
 config.Site.storageSite = 'T2_EE_Estonia'
-# config.Site.whitelist = ['T2_EE_Estonia']
+config.Site.whitelist = ['T2_EE_Estonia']

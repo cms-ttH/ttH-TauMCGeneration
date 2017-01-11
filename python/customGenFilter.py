@@ -13,9 +13,7 @@ def customizeForGenFiltering(process):
             sequence.insert(1, process.ttHfilter)
     if hasattr(process, 'pdigi'):
         getattr(process, 'pdigi').insert(5, process.ttHfilter)
-    process.ttHfilter_step = cms.Path(process.ttHfilter)
-    process.schedule.extend([process.ttHfilter_step])
-    process.AODSIMoutput.SelectEvents.SelectEvents = cms.vstring('ttHfilter_step')
+    process.AODSIMoutput.SelectEvents.SelectEvents = cms.vstring('generation_step')
     return process
 
 

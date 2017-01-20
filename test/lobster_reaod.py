@@ -41,7 +41,7 @@ for path in lhe:
         pset='configs/' + dset + '_aod.py',
         dataset=cmssw.Dataset(
             dataset=path,
-            instance='phys03',
+            dbs_instance='phys03',
             lumis_per_task=4
         ),
         category=Category(

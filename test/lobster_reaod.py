@@ -95,5 +95,3 @@ config = Config(
         ]
     )
 )
-
-print config

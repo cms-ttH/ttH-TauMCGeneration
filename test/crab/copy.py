@@ -18,12 +18,14 @@ def generate(dataset):
     config.section_('Data')
     config.Data.inputDataset = dataset
     config.Data.inputDBS = 'phys03'
+    # config.Data.ignoreLocality = True
     config.Data.splitting = 'FileBased'
     config.Data.unitsPerJob = 4
     config.Data.publication = True
     config.Data.outputDatasetTag = 'copy_' + tag
 
     config.section_('Site')
+    # config.Site.whitelist = ['T3_US_NotreDame']
     config.Site.storageSite = 'T2_EE_Estonia'
     return config
 

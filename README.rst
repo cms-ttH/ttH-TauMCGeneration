@@ -3,6 +3,15 @@ MC Generation
 
 .. contents::
 
+For the impatient
+-----------------
+
+Run the following *outside* a release to get a new release containing some
+configurations in the `src` directory:
+
+    wget https://raw.githubusercontent.com/cms-ttH/ttH-TauMCGeneration/master/test/ttl_fast.sh
+    bash ttl_fast.sh
+
 Pulling in basic steps from McM
 -------------------------------
 

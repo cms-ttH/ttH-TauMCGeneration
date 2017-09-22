@@ -34,6 +34,13 @@ setups[WZ]="python/SMP-RunIIWinter15wmLHE-00019-fragment.py python/SMP-RunIISumm
 setups[ttW]=python/TOP-RunIISummer15wmLHEGS-00012-fragment.py
 setups[ttZ]=python/TOP-RunIISummer15wmLHEGS-00013-fragment.py
 
+voms-proxy-info -exists
+if [ $das -eq 1 -a $? -eq 1 ]; then
+   echo "need a valid proxy"
+   exit 1
+fi
+
+
 if [ $setup -eq 1 ]; then
    scram p CMSSW $release
    cd $release/src
@@ -53,10 +60,9 @@ for cfgs in "${setups[@]}"; do
 done
 
 if [ $setup -eq 1 ]; then
-   git clone git@github.com:cms-ttH/ttH-TauMCGeneration.git ttH/TauMCGeneration
+   git clone https://github.com/cms-ttH/ttH-TauMCGeneration.git ttH/TauMCGeneration
    eval `scram runtime -sh`
    scram b
-   cd ../..
 fi
 
 if [ $das -eq 1 ]; then

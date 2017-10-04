@@ -27,11 +27,11 @@ def generate(dataset):
     # (ND is not!)
     config.Data.ignoreLocality = True
     config.Data.splitting = 'FileBased'
-    config.Data.unitsPerJob = 4
+    config.Data.unitsPerJob = 1
     config.Data.publication = True
     config.Data.outputDatasetTag = 'copy_' + tag
     config.Data.outputPrimaryDataset = primary
-    config.Data.userInputFiles = ['root://deepthought.crc.nd.edu/{}'.format(fn) for fn in files]
+    config.Data.userInputFiles = ['gsiftp://deepthought.crc.nd.edu//hadoop{}'.format(fn) for fn in files]
 
     config.section_('Site')
     # Apparently, we are blacklisted on the CRAB server side! Ignore the

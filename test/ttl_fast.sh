@@ -24,15 +24,16 @@ era=Run2_2016
 release=CMSSW_8_0_21
 globaltag=80X_mcRun2_asymptotic_2016_TrancheIV_v6
 premix=/Neutrino_E-10_gun/RunIISummer16FSPremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/GEN-SIM-DIGI-RAW
+hlt=@frozen2016
 
 declare -A setups
 
-# setups[ttH]=python/HIG-RunIISummer15wmLHEGS-00484-fragment.py
+setups[ttH]=python/ThirteenTeV/Higgs/ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_cff.py
 # setups[ttjets_dl]=python/HIG-RunIISummer15wmLHEGS-00481-fragment.py
 # setups[ttjets_sl]=python/HIG-RunIISummer15wmLHEGS-00482-fragment.py
-setups[WZ]="python/SMP-RunIIWinter15wmLHE-00019-fragment.py python/SMP-RunIISummer15GS-00015-fragment.py"
-setups[ttW]=python/TOP-RunIISummer15wmLHEGS-00012-fragment.py
-setups[ttZ]=python/TOP-RunIISummer15wmLHEGS-00013-fragment.py
+# setups[WZ]="python/SMP-RunIIWinter15wmLHE-00019-fragment.py python/SMP-RunIISummer15GS-00015-fragment.py"
+# setups[ttW]=python/TOP-RunIISummer15wmLHEGS-00012-fragment.py
+# setups[ttZ]=python/TOP-RunIISummer15wmLHEGS-00013-fragment.py
 
 voms-proxy-info -exists
 if [ $das -eq 1 -a $? -eq 1 ]; then
@@ -54,7 +55,7 @@ for cfgs in "${setups[@]}"; do
          cfg=${cfg//-/_}
          curl -s --insecure https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/$frag --retry 2 --create-dirs -o Configuration/GenProduction/$cfg
       else
-         curl -s https://raw.githubusercontent.com/cms-sw/genproductions/2f28097e385e7a217a839f59e180fa9b38d89e15/$cfg --retry 2 --create-dirs -o Configuration/GenProduction/$cfg
+         curl -s https://raw.githubusercontent.com/cms-sw/genproductions/ec41da72f49da415238cff8d11b2c8ab5b685f14/$cfg --retry 2 --create-dirs -o Configuration/GenProduction/$cfg
       fi
    done
 done
@@ -91,7 +92,7 @@ mk_cfg() {
          --datatier AODSIM \
          --conditions $globaltag \
          --beamspot Realistic50ns13TeVCollision \
-         --step LHE,GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 \
+         --step LHE,GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:$hlt \
          --datamix PreMix \
          --era $era \
          --no_exec
@@ -124,7 +125,7 @@ mk_cfg() {
          --datatier AODSIM \
          --conditions $globaltag \
          --beamspot Realistic50ns13TeVCollision \
-         --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:@frozen2016 \
+         --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:$hlt \
          --datamix PreMix \
          --era $era \
          --no_exec

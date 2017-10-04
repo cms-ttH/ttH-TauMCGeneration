@@ -12,6 +12,35 @@ configurations in the `src` directory::
     wget https://raw.githubusercontent.com/cms-ttH/ttH-TauMCGeneration/master/test/ttl_fast.sh
     bash ttl_fast.sh
 
+The resulting configurations are a mashup of information from McM and the
+FastSim TWiki pages. Examples and templates for CRAB submission files can
+be found in `test/crab <test/crab>`_.
+
+Updating the configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The following settings should be updated in the script referenced above for
+following iterations, most of this information is near the top of the file:
+
+- Era (``era``)
+- Software release (``release``)
+- Conditions (``globaltag``)
+- Pile-up dataset (``premix``)
+- The HLT menu (``hlt``)
+
+Check the beamspot settings, too!
+
+Copying output from Notre Dame
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Example configurations to copy LHE data out of Notre Dame can be generated
+(from the base directory of this repository)::
+
+    cd test
+    python crab/copy.py
+
+with CRAB configuration files generated in `test/crab <test/crab>`_.
+
 Pulling in basic steps from McM
 -------------------------------
 

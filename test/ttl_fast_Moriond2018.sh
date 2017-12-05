@@ -2,7 +2,7 @@ set -e
 set -x
 
 das=1
-setup=1
+setup=0
 
 usage() { echo "usage: $0 [-ds]"; exit 1; }
 
@@ -35,12 +35,13 @@ beamspot=Realistic25ns13TeVEarly2017Collision
 
 declare -A setups
 
-setups[ttH]=python/ThirteenTeV/Higgs/ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_cff.py
-# setups[ttjets_dl]=python/HIG-RunIISummer15wmLHEGS-00481-fragment.py
-# setups[ttjets_sl]=python/HIG-RunIISummer15wmLHEGS-00482-fragment.py
+setups[ttH]=ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_cff.py
+#setups[ttjets_dl]=TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8_cff.py
+#setups[ttjets_sl_t]=TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8_cff.py
+#setups[ttjets_sl_tbar]=TTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_cff.py
+#setups[ttW]=TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_cff.py
+#setups[ttZ]=TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_cff.py
 # setups[WZ]="python/SMP-RunIIWinter15wmLHE-00019-fragment.py python/SMP-RunIISummer15GS-00015-fragment.py"
-# setups[ttW]=python/TOP-RunIISummer15wmLHEGS-00012-fragment.py
-# setups[ttZ]=python/TOP-RunIISummer15wmLHEGS-00013-fragment.py
 
 Init_proxy()
 {
@@ -70,7 +71,7 @@ Get_fragments()
                 remote_path="--insecure https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/"
                 remote_path=${remote_path}${frag}
             else
-                remote_path="https://raw.githubusercontent.com/cms-sw/genproductions/ec41da72f49da415238cff8d11b2c8ab5b685f14/"
+                remote_path="https://raw.githubusercontent.com/cms-sw/genproductions/6c354c4e733ae957afffe0a8a73ec13435cfd8a3/"
                 remote_path=${remote_path}${cfg}
             fi
             curl -s ${remote_path} \
@@ -79,6 +80,18 @@ Get_fragments()
                 -o Configuration/GenProduction/$cfg
         done
     done
+}
+
+
+Copy_fragments()
+{
+    cd $release/src
+    if [ $setup -eq 1 ]; then
+      mkdir -p Configuration/GenProduction/python/ThirteenTeV/Higgs/
+    fi
+    cp ../../cff/* Configuration/GenProduction/python/ThirteenTeV/Higgs/
+    scram b
+    cd ../../
 }
 
 Get_repo()
@@ -103,33 +116,35 @@ Run_AOD_in_1step()
     sample=$1
     config=$2
     filter=$3
-    
-    cmsDriver.py Configuration/GenProduction/python/tmp_fragment.py \
+
+    cmsDriver.py Configuration/GenProduction/python/ThirteenTeV/Higgs/${setups[$smpl]} \
         -n 100 \
         --python_filename ${sample}_aod.py \
         --fileout file:${sample}_aod.root \
-        --pileup_input "[]" \
         --mc \
         --eventcontent AODSIM \
         --fast \
-        --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput \
         $filter \
         --datatier AODSIM \
         --conditions $globaltag \
         --beamspot ${beamspot} \
-        --step LHE,GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:$hlt \
-        --datamix PreMix \
+        --step LHE,GEN,SIM,L1,DIGI2RAW,L1Reco,RECO \
         --era $era \
         --no_exec
 }
+
+#--pileup_input "[]" \
+# --step LHE,GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:$hlt \
+#--datamix PreMix \
+#--customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput \
 
 Run_AOD_in_2steps()
 {
     sample=$1
     config=$2
     filter=$3
-    
-    cmsDriver.py Configuration/GenProduction/$config \
+
+    cmsDriver.py Configuration/GenProduction/python/ThirteenTeV/Higgs/$config \
         -n 100 \
         --python_filename ${sample}_lhe.py \
         --fileout file:${sample}_lhe.root \
@@ -143,30 +158,31 @@ Run_AOD_in_2steps()
         --era $era \
         --no_exec
 
-    cmsDriver.py Configuration/GenProduction/$config \
+    cmsDriver.py Configuration/GenProduction/python/ThirteenTeV/Higgs/$config \
         -n 100 \
         --python_filename ${sample}_aod.py \
         --fileout file:${sample}_aod.root \
         --filein file:${sample}_lhe.root \
-        --pileup_input "[]" \
         --mc \
         --eventcontent AODSIM \
         --fast \
-        --customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput \
         $filter \
         --datatier AODSIM \
         --conditions $globaltag \
         --beamspot ${beamspot} \
-        --step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:$hlt \
-        --datamix PreMix \
+        --step GEN,SIM,L1,DIGI2RAW,L1Reco,RECO \
         --era $era \
         --no_exec
 }
+#--step GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:$hlt \
+#--datamix PreMix \
+# --pileup_input "[]" \
+#--customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput \
 
 Run_MAOD_step()
 {
     sample=$1
-    
+
     cmsDriver.py \
         -n 100 \
         --python_filename ${sample}_maod.py \
@@ -190,26 +206,26 @@ Make_cfgs()
     filter=$3
 
     config=${config//-/_}
-    cat ${config//python/Configuration\/GenProduction\/python} >> \
-        Configuration/GenProduction/python/tmp_fragment.py
+    #cat ${config//python/Configuration\/GenProduction\/python} >> \
+    #    Configuration/GenProduction/python/tmp_fragment.py
 
     if [[ $sample =~ ttW || $sample =~ ttZ || $sample =~ WZ ]]; then
         Run_AOD_in_1step "${sample}" "${config}" "${filter}"
     else
         Run_AOD_in_2steps "${sample}" "${config}" "${filter}"
     fi
-
-    rm Configuration/GenProduction/python/tmp_fragment.py
+    #Run_AOD_in_1step "${sample}" "${config}" "${filter}"
+    #rm Configuration/GenProduction/python/tmp_fragment.py
 
     # Add premix part to the AOD py
-    cat <<EOF >>${sample}_aod.py
-import os
-process.mixData.input.fileNames = cms.untracked.vstring([])
-with open(os.path.join(os.environ['LOCALRT'],
-                       'src/ttH/TauMCGeneration/data/pufiles.txt')) as fd:
-    for line in fd:
-        process.mixData.input.fileNames.append(line.strip())
-EOF
+    #cat <<EOF >>${sample}_aod.py
+#import os
+#process.mixData.input.fileNames = cms.untracked.vstring([])
+#with open(os.path.join(os.environ['LOCALRT'],
+#                       'src/ttH/TauMCGeneration/data/pufiles.txt')) as fd:
+#    for line in fd:
+#        process.mixData.input.fileNames.append(line.strip())
+#EOF
 
     Run_MAOD_step "${sample}"
 }
@@ -217,11 +233,12 @@ EOF
 #
 # Execute
 #
-Init_proxy
+#Init_proxy
 Init_CMSSW
-Get_fragments
+Copy_fragments
+#Get_fragments
 Get_repo
-Produce_PU_lookup
+#Produce_PU_lookup
 
 for smpl in "${!setups[@]}"; do
     cfg="${setups[$smpl]}"

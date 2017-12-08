@@ -1,3 +1,7 @@
+Sample: full sample name
+* LHE-GS cmsDriver command
+* fragment (used for LHE-GS)
+
 tt_DL: TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
 * https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_setup/TOP-RunIIFall17wmLHEGS-00001
 * https://cms-pdmv.cern.ch/mcm/public/restapi/requests/get_fragment/TOP-RunIIFall17wmLHEGS-00001/0

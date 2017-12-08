@@ -2,7 +2,7 @@ set -e
 set -x
 
 das=1
-setup=0
+setup=1
 
 usage() { echo "usage: $0 [-ds]"; exit 1; }
 
@@ -20,12 +20,11 @@ while getopts "ds" o; do
    esac
 done
 
+## WIP 2018 AOD/MAOD
 era=Run2_2017
-release=CMSSW_9_4_0
-globaltag=94X_mc2017_realistic_v7
+release_FS=CMSSW_9_4_0
+globaltag_FS=94X_mc2017_realistic_v7
 premix=/Neutrino_E-10_gun/RunIISummer16FSPremix-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v4-v1/GEN-SIM-DIGI-RAW
-hlt=2e34_v2
-beamspot=Realistic25ns13TeVEarly2017Collision
 
 ## Moriond 2017
 # globaltag=80X_mcRun2_asymptotic_2016_TrancheIV_v6
@@ -35,13 +34,13 @@ beamspot=Realistic25ns13TeVEarly2017Collision
 
 declare -A setups
 
-setups[ttH]=ttHJetToNonbb_M125_13TeV_amcatnloFXFX_madspin_pythia8_cff.py
-#setups[ttjets_dl]=TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8_cff.py
-#setups[ttjets_sl_t]=TTJets_SingleLeptFromT_TuneCP5_13TeV-madgraphMLM-pythia8_cff.py
-#setups[ttjets_sl_tbar]=TTJets_SingleLeptFromTbar_TuneCP5_13TeV-madgraphMLM-pythia8_cff.py
-#setups[ttW]=TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8_cff.py
-#setups[ttZ]=TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8_cff.py
-# setups[WZ]="python/SMP-RunIIWinter15wmLHE-00019-fragment.py python/SMP-RunIISummer15GS-00015-fragment.py"
+setups[ttH]=HIG-RunIIFall17wmLHEGS-00044-fragment.py
+# setups[ttjets_dl]=TOP-RunIIFall17wmLHEGS-00001-fragment.py
+# setups[ttjets_sl]=TOP-RunIIFall17wmLHEGS-00002-fragment.py
+# setups[ttW]=HIG-RunIIFall17wmLHEGS-00040-fragment.py
+# setups[ttWW]=TOP-RunIIFall17wmLHEGS-00066-fragment.py
+# setups[ttZ]=HIG-RunIIFall17wmLHEGS-00041-fragment.py
+# setups[WZ]=SMP-RunIIFall17wmLHEGS-00003-fragment.py
 
 Init_proxy()
 {
@@ -57,6 +56,7 @@ Init_CMSSW()
     if [ $setup -eq 1 ]; then
         scram p CMSSW $release
         cd $release/src
+        eval `scram runtime -sh`
     fi
 }
 
@@ -82,16 +82,13 @@ Get_fragments()
     done
 }
 
-
 Copy_fragments()
 {
-    cd $release/src
+    # Existence of ttH/TauMCGeneration is imposed
     if [ $setup -eq 1 ]; then
-      mkdir -p Configuration/GenProduction/python/ThirteenTeV/Higgs/
+        cp -r ttH/TauMCGeneration/Configuration .
+        scram b
     fi
-    cp ../../cff/* Configuration/GenProduction/python/ThirteenTeV/Higgs/
-    scram b
-    cd ../../
 }
 
 Get_repo()
@@ -117,7 +114,7 @@ Run_AOD_in_1step()
     config=$2
     filter=$3
 
-    cmsDriver.py Configuration/GenProduction/python/ThirteenTeV/Higgs/${setups[$smpl]} \
+    cmsDriver.py Configuration/GenProduction/python/${config} \
         -n 100 \
         --python_filename ${sample}_aod.py \
         --fileout file:${sample}_aod.root \
@@ -132,33 +129,18 @@ Run_AOD_in_1step()
         --era $era \
         --no_exec
 }
-
 #--pileup_input "[]" \
 # --step LHE,GEN,SIM,RECOBEFMIX,DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,L1Reco,RECO,HLT:$hlt \
 #--datamix PreMix \
 #--customise SimGeneral/DataMixingModule/customiseForPremixingInput.customiseForPreMixingInput \
 
-Run_AOD_in_2steps()
+Run_AOD_in_2steps_2()
 {
     sample=$1
     config=$2
     filter=$3
-
-    cmsDriver.py Configuration/GenProduction/python/ThirteenTeV/Higgs/$config \
-        -n 100 \
-        --python_filename ${sample}_lhe.py \
-        --fileout file:${sample}_lhe.root \
-        --mc \
-        --eventcontent LHE \
-        --datatier LHE \
-        --fast \
-        --conditions $globaltag \
-        --beamspot ${beamspot} \
-        --step LHE \
-        --era $era \
-        --no_exec
-
-    cmsDriver.py Configuration/GenProduction/python/ThirteenTeV/Higgs/$config \
+    
+    cmsDriver.py Configuration/GenProduction/python/${config} \
         -n 100 \
         --python_filename ${sample}_aod.py \
         --fileout file:${sample}_aod.root \
@@ -168,7 +150,7 @@ Run_AOD_in_2steps()
         --fast \
         $filter \
         --datatier AODSIM \
-        --conditions $globaltag \
+        --conditions ${globaltag_FS} \
         --beamspot ${beamspot} \
         --step GEN,SIM,L1,DIGI2RAW,L1Reco,RECO \
         --era $era \
@@ -204,18 +186,9 @@ Make_cfgs()
     sample=$1
     config=$2
     filter=$3
-
-    config=${config//-/_}
-    #cat ${config//python/Configuration\/GenProduction\/python} >> \
-    #    Configuration/GenProduction/python/tmp_fragment.py
-
-    if [[ $sample =~ ttW || $sample =~ ttZ || $sample =~ WZ ]]; then
-        Run_AOD_in_1step "${sample}" "${config}" "${filter}"
-    else
-        Run_AOD_in_2steps "${sample}" "${config}" "${filter}"
-    fi
-    #Run_AOD_in_1step "${sample}" "${config}" "${filter}"
-    #rm Configuration/GenProduction/python/tmp_fragment.py
+    
+    # AOD
+    Run_AOD_in_2steps_2 "${sample}" "${config}" "${filter}"
 
     # Add premix part to the AOD py
     #cat <<EOF >>${sample}_aod.py
@@ -235,16 +208,14 @@ Make_cfgs()
 #
 #Init_proxy
 Init_CMSSW
+Get_repo
 Copy_fragments
 #Get_fragments
-Get_repo
 #Produce_PU_lookup
 
 for smpl in "${!setups[@]}"; do
     cfg="${setups[$smpl]}"
     fltr="--customise ttH/TauMCGeneration/customGenFilter.customizeForGenFilteringWithFakes"
 
-    # Make_cfgs $smpl $cfg ""
-    # Make_cfgs ${smpl}_filtered $cfg "$fltr"
-    Make_cfgs ${smpl} "$cfg" "$fltr"
+    Make_cfgs "${smpl}" "$cfg" "$fltr"
 done
